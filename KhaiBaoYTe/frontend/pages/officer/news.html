@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bài đăng tin tức</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content, headerActions } = Layout.mount({
+      role:'officer', active:'news',
+      pageTitle:'Bài đăng tin tức y tế',
+      pageSub:'Tạo và quản lý các bài đăng hiển thị cho người dân.'
+    });
+    headerActions.innerHTML = `<button class="btn btn-primary" id="btn-new">+ Tạo bài đăng</button>`;
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo tiêu đề..."></div>
+        <select class="form-control" id="f-type" style="max-width:220px">
+          <option value="">Tất cả phân loại</option>
+          <option>Hướng dẫn</option><option>Tin tức dịch bệnh</option><option>Thông báo khẩn</option>
+        </select>
+      </div>
+      <div class="news-grid" id="grid"></div>
+    `);
+
+    const grid = document.getElementById('grid');
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const t = document.getElementById('f-type').value;
+      const list = MOCK.news.filter(n =>
+        (!q || n.title.toLowerCase().includes(q)) && (!t || n.type === t));
+      grid.innerHTML = list.length ? list.map(n => `
+        <article class="news-card">
+          <div class="thumb">${n.icon}</div>
+          <div class="body">
+            <span class="badge badge-primary">${n.type}</span>
+            <h3>${n.title}</h3>
+            <p class="text-muted text-sm">${n.summary}</p>
+            <div class="meta"><span>${fmtDate(n.date)}</span>
+              <div class="flex gap-2">
+                <button class="btn btn-ghost btn-sm">✏️</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger)">🗑</button>
+              </div>
+            </div>
+          </div>
+        </article>`).join('')
+        : '<div class="empty">Chưa có bài đăng nào.</div>';
+    }
+    document.getElementById('q').addEventListener('input', debounce(render,200));
+    document.getElementById('f-type').addEventListener('change', render);
+    render();
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      modal({
+        title:'Tạo bài đăng tin tức',
+        body: `
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Phân loại<span class="req">*</span></label>
+              <select class="form-control"><option>Hướng dẫn</option><option>Tin tức dịch bệnh</option><option>Thông báo khẩn</option></select></div>
+            <div class="form-group"><label class="form-label">Trạng thái</label>
+              <select class="form-control"><option>Hiển thị</option><option>Nháp</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Tiêu đề<span class="req">*</span></label>
+            <input class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Tóm tắt<span class="req">*</span></label>
+            <textarea class="form-control" rows="2" required></textarea></div>
+          <div class="form-group"><label class="form-label">Nội dung chi tiết<span class="req">*</span></label>
+            <textarea class="form-control" rows="5" required></textarea></div>
+          <div class="form-group"><label class="form-label">Ảnh đại diện</label>
+            <input class="form-control" type="file" accept="image/*"></div>
+        `,
+        okText:'Đăng bài',
+        onOk:() => toast('Đã đăng bài tin tức','success')
+      });
+    });
+  </script>
+</body>
+</html>

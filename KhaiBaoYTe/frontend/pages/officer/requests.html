@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yêu cầu hỗ trợ</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'officer', active:'requests',
+      pageTitle:'Yêu cầu hỗ trợ y tế',
+      pageSub:'Tiếp nhận, phản hồi các yêu cầu được người dân gửi tới.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo người gửi, tiêu đề..."></div>
+        <select class="form-control" id="f-loai" style="max-width:200px">
+          <option value="">Tất cả loại</option>
+          <option>Tư vấn y tế</option><option>Yêu cầu khám tại nhà</option>
+          <option>Xin thuốc</option><option>Khác</option>
+        </select>
+        <select class="form-control" id="f-st" style="max-width:200px">
+          <option value="">Tất cả trạng thái</option>
+          <option>Chờ xử lý</option><option>Đang xử lý</option><option>Đã phản hồi</option>
+        </select>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.2fr 1fr;gap:18px">
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Người gửi</th><th>Loại</th><th>Tiêu đề</th><th>Thời gian</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <div class="card" id="detail">
+          <div class="card-header"><h3 class="card-title">Chi tiết yêu cầu</h3></div>
+          <div class="card-body">
+            <div class="empty">Chọn một yêu cầu ở bảng bên trái để xem chi tiết và phản hồi.</div>
+          </div>
+        </div>
+      </div>
+    `);
+
+    const rows = document.getElementById('rows');
+    let current = null;
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const loai = document.getElementById('f-loai').value;
+      const st = document.getElementById('f-st').value;
+      const list = MOCK.requests.filter(r =>
+        (!q || r.hoTen.toLowerCase().includes(q) || r.tieuDe.toLowerCase().includes(q)) &&
+        (!loai || r.loai === loai) && (!st || r.trangThai === st));
+      rows.innerHTML = list.map(r => `
+        <tr style="cursor:pointer" data-id="${r.id}">
+          <td><strong>${r.hoTen}</strong><div class="text-xs text-muted">${r.maNguoiDan}</div></td>
+          <td><span class="badge badge-info">${r.loai}</span></td>
+          <td>${r.tieuDe}</td>
+          <td>${fmtDateTime(r.thoiGian)}</td>
+          <td><span class="badge ${r.trangThai==='Đã phản hồi'?'badge-success':r.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${r.trangThai}</span></td>
+          <td><button class="btn btn-ghost btn-sm">Xem</button></td>
+        </tr>`).join('') || '<tr><td colspan="6"><div class="empty">Không có yêu cầu phù hợp.</div></td></tr>';
+    }
+    function selectRow(id){
+      current = MOCK.requests.find(r => r.id === id);
+      const d = document.getElementById('detail');
+      d.querySelector('.card-body').innerHTML = `
+        <div class="flex justify-between mb-3">
+          <h3>${current.tieuDe}</h3>
+          <span class="badge ${current.trangThai==='Đã phản hồi'?'badge-success':current.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${current.trangThai}</span>
+        </div>
+        <div class="text-muted text-sm mb-2">Người gửi: <strong>${current.hoTen}</strong> (${current.maNguoiDan})</div>
+        <div class="text-muted text-sm mb-2">Loại: ${current.loai}</div>
+        <div class="text-muted text-sm mb-3">Thời gian: ${fmtDateTime(current.thoiGian)}</div>
+        <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:14px">${current.noiDung}</div>
+
+        <div class="form-group"><label class="form-label">Phản hồi của bạn</label>
+          <textarea class="form-control" id="rep" placeholder="Nội dung phản hồi gửi cho người dân..."></textarea></div>
+        <div class="form-group"><label class="form-label">Tệp đính kèm</label>
+          <input class="form-control" type="file" multiple></div>
+        <div class="flex justify-end gap-2 mt-2">
+          <button class="btn btn-outline" id="btn-progress">Đánh dấu đang xử lý</button>
+          <button class="btn btn-primary" id="btn-send">Gửi phản hồi</button>
+        </div>
+      `;
+      d.querySelector('#btn-progress').addEventListener('click', () => { current.trangThai='Đang xử lý'; render(); toast('Đã chuyển sang đang xử lý','info'); });
+      d.querySelector('#btn-send').addEventListener('click', () => {
+        if(!d.querySelector('#rep').value.trim()){ toast('Vui lòng nhập nội dung phản hồi','warning'); return; }
+        current.trangThai='Đã phản hồi'; render(); toast('Đã gửi phản hồi tới người dân','success');
+      });
+    }
+    rows.addEventListener('click', e => {
+      const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+      selectRow(tr.dataset.id);
+    });
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    ['f-loai','f-st'].forEach(id => document.getElementById(id).addEventListener('change', render));
+    render();
+  </script>
+</body>
+</html>

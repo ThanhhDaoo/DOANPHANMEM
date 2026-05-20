@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Danh sách khai báo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'officer', active:'declarations',
+      pageTitle:'Danh sách khai báo y tế',
+      pageSub:'Tra cứu, lọc và xử lý các phiếu khai báo của người dân.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tên, CCCD, mã khai báo..."></div>
+        <select class="form-control" id="f-tdp" style="max-width:180px">
+          <option value="">Tất cả tổ DP</option>
+          ${MOCK.toDanPho.map(t => `<option value="${t.id}">${t.ten}</option>`).join('')}
+        </select>
+        <select class="form-control" id="f-rs" style="max-width:180px">
+          <option value="">Mức nguy cơ</option>
+          <option>Cao</option><option>Trung bình</option><option>Thấp</option>
+        </select>
+        <select class="form-control" id="f-st" style="max-width:200px">
+          <option value="">Trạng thái</option>
+          <option>Chờ xử lý</option><option>Đang xử lý</option><option>Đã xử lý</option>
+        </select>
+        <button class="btn btn-outline" onclick="toast('Đã xuất file Excel mẫu','success')">⬇ Xuất Excel</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>Mã KB</th><th>Người dân</th><th>Tổ DP</th><th>Thời gian</th>
+              <th>Nhiệt độ</th><th>Triệu chứng</th><th>Nguy cơ</th><th>Trạng thái</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="pagination">
+          <button disabled>‹</button>
+          <button class="active">1</button><button>2</button><button>3</button>
+          <button>›</button>
+        </div>
+      </div>
+    `);
+
+    const rows = document.getElementById('rows');
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const tdp = document.getElementById('f-tdp').value;
+      const rs = document.getElementById('f-rs').value;
+      const st = document.getElementById('f-st').value;
+      const list = MOCK.declarations.filter(d =>
+        (!q || d.id.toLowerCase().includes(q) || d.hoTen.toLowerCase().includes(q)) &&
+        (!tdp || d.toDanPho === tdp) && (!rs || d.nguyCo === rs) && (!st || d.trangThai === st));
+      rows.innerHTML = list.length ? list.map(d => `
+        <tr>
+          <td><input type="checkbox"></td>
+          <td><strong>${d.id}</strong></td>
+          <td>${d.hoTen}<div class="text-xs text-muted">${d.maNguoiDan}</div></td>
+          <td>${d.toDanPho}</td>
+          <td>${fmtDateTime(d.thoiGian)}</td>
+          <td>${d.nhietDo}°C</td>
+          <td>${d.trieuChung}</td>
+          <td><span class="badge ${d.nguyCo==='Cao'?'badge-danger':d.nguyCo==='Trung bình'?'badge-warning':'badge-success'}">${d.nguyCo}</span></td>
+          <td><span class="badge ${d.trangThai==='Đã xử lý'?'badge-success':d.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${d.trangThai}</span></td>
+          <td class="actions">
+            <button class="btn btn-ghost btn-sm" title="Xem">👁</button>
+            <button class="btn btn-ghost btn-sm" title="Cập nhật theo dõi" onclick="window.location='tracking.html'">📝</button>
+          </td>
+        </tr>`).join('')
+        : '<tr><td colspan="10"><div class="empty">Không có dữ liệu phù hợp.</div></td></tr>';
+    }
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    ['f-tdp','f-rs','f-st'].forEach(id => document.getElementById(id).addEventListener('change', render));
+    render();
+  </script>
+</body>
+</html>

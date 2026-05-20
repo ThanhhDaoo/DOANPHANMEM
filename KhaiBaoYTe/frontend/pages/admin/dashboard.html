@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tổng quan hệ thống - Admin</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'admin', active:'dashboard',
+      pageTitle:'Tổng quan hệ thống',
+      pageSub:'Theo dõi toàn bộ tài khoản, danh mục và hoạt động hệ thống.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="stats-grid mb-6">
+        <div class="stat"><div class="icon">👥</div><div class="label">Tổng tài khoản</div><div class="value">1.524</div><div class="delta">+24 trong tuần</div></div>
+        <div class="stat"><div class="icon">⚕️</div><div class="label">Cán bộ y tế</div><div class="value">8</div><div class="delta">2 đang hoạt động</div></div>
+        <div class="stat"><div class="icon">🏘️</div><div class="label">Tổ dân phố</div><div class="value">12</div><div class="delta">Cấu hình đầy đủ</div></div>
+        <div class="stat"><div class="icon">🛡️</div><div class="label">Đăng nhập 24h</div><div class="value">486</div><div class="delta">+8% so với hôm qua</div></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tài khoản mới đăng ký</h3>
+            <a class="btn btn-ghost btn-sm" href="accounts.html">Xem tất cả →</a>
+          </div>
+          <div class="table-wrap" style="border:none;border-radius:0">
+            <table class="table">
+              <thead><tr><th>Mã</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th></tr></thead>
+              <tbody>
+                ${MOCK.citizens.slice(0,5).map(c => `
+                  <tr>
+                    <td><strong>${c.id}</strong></td>
+                    <td>${c.hoTen}</td>
+                    <td>${c.vaiTro}</td>
+                    <td><span class="badge ${c.trangThai==='Hoạt động'?'badge-success':'badge-danger'}">${c.trangThai}</span></td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Hoạt động hệ thống gần đây</h3></div>
+          <ul style="display:flex;flex-direction:column">
+            ${[
+              {ico:'➕', t:'Tài khoản ND0125 vừa được tạo', tm:'2 phút trước'},
+              {ico:'✏️', t:'Cập nhật danh mục Tổ dân phố', tm:'15 phút trước'},
+              {ico:'🔒', t:'Khoá tài khoản CB0002', tm:'1 giờ trước'},
+              {ico:'🛡️', t:'Sao lưu CSDL thành công', tm:'3 giờ trước'},
+            ].map(x => `
+              <li style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center">
+                <div style="width:34px;height:34px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center">${x.ico}</div>
+                <div style="flex:1"><div class="text-sm">${x.t}</div><div class="text-xs text-muted">${x.tm}</div></div>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `);
+  </script>
+</body>
+</html>

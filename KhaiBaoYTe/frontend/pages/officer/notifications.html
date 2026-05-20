@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gửi thông báo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'officer', active:'notify',
+      pageTitle:'Gửi thông báo đến người dân',
+      pageSub:'Soạn thông báo, chọn đối tượng nhận và gửi.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px">
+        <form class="card" id="nt-form">
+          <div class="card-header"><h3 class="card-title">Soạn thông báo</h3></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Loại thông báo<span class="req">*</span></label>
+                <select class="form-control" required>
+                  <option>Thông báo</option><option>Nhắc nhở</option><option>Cảnh báo</option>
+                </select></div>
+              <div class="form-group"><label class="form-label">Mức ưu tiên</label>
+                <select class="form-control"><option>Bình thường</option><option>Cao</option><option>Khẩn</option></select></div>
+            </div>
+            <div class="form-group"><label class="form-label">Tiêu đề<span class="req">*</span></label>
+              <input class="form-control" required></div>
+            <div class="form-group"><label class="form-label">Nội dung<span class="req">*</span></label>
+              <textarea class="form-control" rows="5" required></textarea></div>
+
+            <div class="form-group"><label class="form-label">Đối tượng nhận<span class="req">*</span></label>
+              <select class="form-control" id="audience">
+                <option value="all">Toàn bộ người dân trong phường</option>
+                <option value="tdp">Theo tổ dân phố</option>
+                <option value="risk">Theo mức nguy cơ</option>
+                <option value="custom">Chọn cụ thể</option>
+              </select></div>
+
+            <div class="form-group hidden" id="opt-tdp">
+              <label class="form-label">Chọn tổ dân phố</label>
+              <select class="form-control" multiple size="4">
+                ${MOCK.toDanPho.map(t => `<option value="${t.id}">${t.ten}</option>`).join('')}
+              </select>
+              <span class="form-hint">Giữ Ctrl / Cmd để chọn nhiều.</span>
+            </div>
+            <div class="form-group hidden" id="opt-risk">
+              <label class="form-label">Mức nguy cơ</label>
+              <select class="form-control"><option>Cao</option><option>Trung bình</option><option>Thấp</option></select>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-2">
+              <button type="reset" class="btn btn-ghost">Làm lại</button>
+              <button type="button" class="btn btn-outline">Lưu nháp</button>
+              <button type="submit" class="btn btn-primary">📣 Gửi thông báo</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Lịch sử thông báo</h3></div>
+          <ul style="display:flex;flex-direction:column">
+            ${MOCK.notifications.map(n => `
+              <li style="padding:14px 18px;border-bottom:1px solid var(--border)">
+                <div class="flex justify-between"><strong>${n.tieuDe}</strong>
+                  <span class="text-xs text-muted">${fmtDate(n.thoiGian)}</span></div>
+                <div class="text-sm text-muted mt-2">${n.noiDung}</div>
+                <div class="mt-2"><span class="badge badge-muted">${n.loai}</span></div>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `);
+
+    document.getElementById('audience').addEventListener('change', e => {
+      document.getElementById('opt-tdp').classList.toggle('hidden', e.target.value !== 'tdp');
+      document.getElementById('opt-risk').classList.toggle('hidden', e.target.value !== 'risk');
+    });
+    document.getElementById('nt-form').addEventListener('submit', e => {
+      e.preventDefault(); toast('Đã gửi thông báo đến đối tượng đã chọn','success');
+    });
+  </script>
+</body>
+</html>

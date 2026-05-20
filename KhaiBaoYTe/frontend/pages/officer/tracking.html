@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Theo dõi sức khoẻ</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'officer', active:'tracking',
+      pageTitle:'Theo dõi sức khoẻ người dân',
+      pageSub:'Cập nhật trạng thái và mức độ nguy cơ của các trường hợp đang theo dõi.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo tên người dân..."></div>
+        <select class="form-control" id="f-st" style="max-width:240px">
+          <option value="">Tất cả trạng thái</option>
+          ${MOCK.trangThaiSucKhoe.map(t => `<option>${t.ten}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>Người dân</th><th>Tổ DP</th><th>Trạng thái sức khoẻ</th>
+            <th>Mức nguy cơ</th><th>Cập nhật gần nhất</th><th></th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    `);
+
+    const rows = document.getElementById('rows');
+    const tracks = [
+      { hoTen:'Trần Thị Bình',  toDanPho:'TDP1', tt:'Nghi nhiễm',           ng:'Trung bình', t:'2026-05-19 14:00' },
+      { hoTen:'Phạm Thị Mai',   toDanPho:'TDP2', tt:'F0 - Đang điều trị',  ng:'Cao',        t:'2026-05-20 08:30' },
+      { hoTen:'Hoàng Đức Long', toDanPho:'TDP3', tt:'Bình thường',          ng:'Thấp',       t:'2026-05-20 09:00' },
+    ];
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const st = document.getElementById('f-st').value;
+      const list = tracks.filter(x => (!q || x.hoTen.toLowerCase().includes(q)) && (!st || x.tt === st));
+      rows.innerHTML = list.map(x => `
+        <tr>
+          <td><strong>${x.hoTen}</strong></td>
+          <td>${x.toDanPho}</td>
+          <td><span class="badge ${x.tt.includes('F0')?'badge-danger':x.tt==='Nghi nhiễm'?'badge-warning':'badge-success'}">${x.tt}</span></td>
+          <td><span class="badge ${x.ng==='Cao'?'badge-danger':x.ng==='Trung bình'?'badge-warning':'badge-success'}">${x.ng}</span></td>
+          <td>${fmtDateTime(x.t)}</td>
+          <td class="actions"><button class="btn btn-primary btn-sm" onclick="open${x.hoTen.replace(/\\s+/g,'')}()">Cập nhật</button></td>
+        </tr>`).join('');
+    }
+    render();
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    document.getElementById('f-st').addEventListener('change', render);
+
+    function openModal(name){
+      modal({
+        title:'Cập nhật theo dõi - ' + name,
+        body: `
+          <div class="form-group"><label class="form-label">Trạng thái sức khoẻ<span class="req">*</span></label>
+            <select class="form-control">
+              ${MOCK.trangThaiSucKhoe.map(t => `<option>${t.ten}</option>`).join('')}
+            </select></div>
+          <div class="form-group"><label class="form-label">Mức nguy cơ<span class="req">*</span></label>
+            <select class="form-control"><option>Thấp</option><option>Trung bình</option><option>Cao</option></select></div>
+          <div class="form-group"><label class="form-label">Ghi chú chi tiết</label>
+            <textarea class="form-control"></textarea></div>
+        `,
+        okText:'Lưu cập nhật',
+        onOk:() => toast('Đã cập nhật theo dõi','success')
+      });
+    }
+    // gắn handler chung cho các nút
+    document.addEventListener('click', e => {
+      if(e.target.matches('button.btn-primary.btn-sm')) {
+        const tr = e.target.closest('tr');
+        if(tr) openModal(tr.querySelector('strong').textContent);
+      }
+    });
+  </script>
+</body>
+</html>

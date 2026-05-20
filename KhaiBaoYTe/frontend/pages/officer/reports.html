@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thống kê - Báo cáo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content, headerActions } = Layout.mount({
+      role:'officer', active:'reports',
+      pageTitle:'Thống kê - Báo cáo',
+      pageSub:'Tổng hợp tình hình khai báo y tế trên địa bàn phường.'
+    });
+    headerActions.innerHTML = `
+      <button class="btn btn-outline" onclick="toast('Đã xuất PDF mẫu','success')">⬇ Xuất PDF</button>
+      <button class="btn btn-primary" onclick="toast('Đã xuất Excel mẫu','success')">⬇ Xuất Excel</button>`;
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <select class="form-control" style="max-width:200px">
+          <option>Tuần này</option><option>Tháng này</option><option>Quý này</option><option>Năm 2026</option>
+        </select>
+        <select class="form-control" style="max-width:200px">
+          <option>Toàn phường</option>${MOCK.toDanPho.map(t => `<option>${t.ten}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="stats-grid mb-6">
+        <div class="stat"><div class="icon">📋</div><div class="label">Tổng khai báo</div><div class="value">1.248</div><div class="delta">+12% so với kỳ trước</div></div>
+        <div class="stat"><div class="icon">⚠️</div><div class="label">Nguy cơ cao</div><div class="value">28</div><div class="delta down">+5</div></div>
+        <div class="stat"><div class="icon">✅</div><div class="label">Đã xử lý</div><div class="value">1.187</div><div class="delta">95.1%</div></div>
+        <div class="stat"><div class="icon">🆘</div><div class="label">Yêu cầu hỗ trợ</div><div class="value">86</div><div class="delta">96% phản hồi đúng hạn</div></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Khai báo theo ngày (7 ngày gần nhất)</h3></div>
+          <div class="card-body">
+            <div id="chart" style="display:flex;align-items:flex-end;gap:14px;height:220px;padding:10px">
+              ${[42,55,38,67,49,72,38].map((v,i) => `
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+                  <span class="text-xs text-muted">${v}</span>
+                  <div style="width:100%;height:${v*2}px;background:linear-gradient(180deg,var(--primary),var(--primary-600));border-radius:6px 6px 0 0"></div>
+                  <span class="text-xs text-muted">T${i+2}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Phân bố mức nguy cơ</h3></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            ${[
+              {l:'Thấp', v:1100, c:'var(--success)'},
+              {l:'Trung bình', v:120, c:'var(--warning)'},
+              {l:'Cao', v:28, c:'var(--danger)'}
+            ].map(x => `
+              <div>
+                <div class="flex justify-between mb-2 text-sm"><span>${x.l}</span><strong>${x.v}</strong></div>
+                <div style="height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden">
+                  <div style="height:100%;width:${x.v/12}%;background:${x.c};border-radius:99px"></div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Bảng tổng hợp theo tổ dân phố</h3></div>
+        <div class="table-wrap" style="border:none;border-radius:0">
+          <table class="table">
+            <thead><tr><th>Tổ dân phố</th><th>Tổng khai báo</th><th>Nguy cơ cao</th><th>Đã xử lý</th><th>Tỉ lệ phản hồi</th></tr></thead>
+            <tbody>
+              ${MOCK.toDanPho.map((t,i) => {
+                const tot = [342,288,350,268][i];
+                const hi = [8,4,12,4][i];
+                return `<tr><td><strong>${t.ten}</strong></td><td>${tot}</td><td>${hi}</td><td>${tot-12}</td><td>96%</td></tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `);
+  </script>
+</body>
+</html>

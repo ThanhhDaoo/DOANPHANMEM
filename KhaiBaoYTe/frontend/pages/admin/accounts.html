@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý tài khoản</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content, headerActions } = Layout.mount({
+      role:'admin', active:'accounts',
+      pageTitle:'Quản lý tài khoản',
+      pageSub:'Tạo, chỉnh sửa, khoá / mở tài khoản người dùng.'
+    });
+    headerActions.innerHTML = `<button class="btn btn-primary" id="btn-new">+ Thêm tài khoản</button>`;
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo tên, CCCD, SĐT..."></div>
+        <select class="form-control" id="f-role" style="max-width:180px">
+          <option value="">Tất cả vai trò</option>
+          <option>Người dân</option><option>Cán bộ y tế</option>
+        </select>
+        <select class="form-control" id="f-st" style="max-width:180px">
+          <option value="">Tất cả trạng thái</option>
+          <option>Hoạt động</option><option>Khoá</option>
+        </select>
+        <select class="form-control" id="f-tdp" style="max-width:180px">
+          <option value="">Tất cả tổ DP</option>
+          ${MOCK.toDanPho.map(t => `<option>${t.id}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th><input type="checkbox"></th>
+            <th>Mã</th><th>Họ tên</th><th>CCCD</th><th>SĐT</th>
+            <th>Tổ DP</th><th>Vai trò</th><th>Trạng thái</th><th></th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="pagination">
+          <button disabled>‹</button>
+          <button class="active">1</button><button>2</button>
+          <button>›</button>
+        </div>
+      </div>
+    `);
+
+    const rows = document.getElementById('rows');
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const r = document.getElementById('f-role').value;
+      const s = document.getElementById('f-st').value;
+      const t = document.getElementById('f-tdp').value;
+      const list = MOCK.citizens.filter(c =>
+        (!q || c.hoTen.toLowerCase().includes(q) || c.cccd.includes(q) || c.sdt.includes(q)) &&
+        (!r || c.vaiTro === r) && (!s || c.trangThai === s) && (!t || c.toDanPho === t));
+      rows.innerHTML = list.length ? list.map(c => `
+        <tr>
+          <td><input type="checkbox"></td>
+          <td><strong>${c.id}</strong></td>
+          <td>${c.hoTen}<div class="text-xs text-muted">${fmtDate(c.ngaySinh)} - ${c.gioiTinh}</div></td>
+          <td>${c.cccd}</td>
+          <td>${c.sdt}</td>
+          <td>${c.toDanPho}</td>
+          <td><span class="badge ${c.vaiTro==='Cán bộ y tế'?'badge-info':'badge-muted'}">${c.vaiTro}</span></td>
+          <td><span class="badge ${c.trangThai==='Hoạt động'?'badge-success':'badge-danger'}">${c.trangThai}</span></td>
+          <td class="actions">
+            <button class="btn btn-ghost btn-sm" title="Sửa" onclick="openEdit('${c.id}')">✏️</button>
+            <button class="btn btn-ghost btn-sm" title="Đặt lại MK" onclick="toast('Đã gửi mật khẩu mới qua SMS','success')">🔑</button>
+            <button class="btn btn-ghost btn-sm" title="${c.trangThai==='Hoạt động'?'Khoá':'Mở khoá'}" style="color:${c.trangThai==='Hoạt động'?'var(--danger)':'var(--success)'}" onclick="toggleLock('${c.id}')">${c.trangThai==='Hoạt động'?'🔒':'🔓'}</button>
+          </td>
+        </tr>`).join('')
+        : '<tr><td colspan="9"><div class="empty">Không có tài khoản phù hợp.</div></td></tr>';
+    }
+    function toggleLock(id){
+      const c = MOCK.citizens.find(x => x.id === id);
+      c.trangThai = c.trangThai === 'Hoạt động' ? 'Khoá' : 'Hoạt động';
+      toast('Đã cập nhật trạng thái tài khoản','success'); render();
+    }
+    window.toggleLock = toggleLock;
+
+    function accountForm(c){
+      return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Họ tên<span class="req">*</span></label>
+            <input class="form-control" value="${c?.hoTen||''}" required></div>
+          <div class="form-group"><label class="form-label">CCCD<span class="req">*</span></label>
+            <input class="form-control" value="${c?.cccd||''}" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Số điện thoại<span class="req">*</span></label>
+            <input class="form-control" value="${c?.sdt||''}" required></div>
+          <div class="form-group"><label class="form-label">Tổ dân phố</label>
+            <select class="form-control">
+              ${MOCK.toDanPho.map(t => `<option ${c?.toDanPho===t.id?'selected':''}>${t.id}</option>`).join('')}
+            </select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Vai trò</label>
+            <select class="form-control">
+              <option ${c?.vaiTro==='Người dân'?'selected':''}>Người dân</option>
+              <option ${c?.vaiTro==='Cán bộ y tế'?'selected':''}>Cán bộ y tế</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Trạng thái</label>
+            <select class="form-control">
+              <option ${c?.trangThai==='Hoạt động'?'selected':''}>Hoạt động</option>
+              <option ${c?.trangThai==='Khoá'?'selected':''}>Khoá</option>
+            </select></div>
+        </div>`;
+    }
+    function openEdit(id){
+      const c = MOCK.citizens.find(x => x.id === id);
+      modal({ title:'Cập nhật tài khoản - ' + c.id, body: accountForm(c), okText:'Lưu thay đổi',
+        onOk:() => toast('Đã cập nhật tài khoản','success') });
+    }
+    window.openEdit = openEdit;
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      modal({ title:'Thêm tài khoản mới', body: accountForm(), okText:'Tạo tài khoản',
+        onOk:() => toast('Đã tạo tài khoản, mật khẩu được gửi qua SMS','success') });
+    });
+
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    ['f-role','f-st','f-tdp'].forEach(id => document.getElementById(id).addEventListener('change', render));
+    render();
+  </script>
+</body>
+</html>

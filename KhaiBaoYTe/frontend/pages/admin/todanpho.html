@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý tổ dân phố</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content, headerActions } = Layout.mount({
+      role:'admin', active:'todanpho',
+      pageTitle:'Danh mục tổ dân phố',
+      pageSub:'Quản lý danh sách tổ dân phố trên địa bàn phường.'
+    });
+    headerActions.innerHTML = `<button class="btn btn-primary" id="btn-new">+ Thêm tổ dân phố</button>`;
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo mã, tên..."></div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Mã</th><th>Tên tổ dân phố</th><th>Mô tả</th><th>Số người dân</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    `);
+
+    const rows = document.getElementById('rows');
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const list = MOCK.toDanPho.filter(t =>
+        !q || t.id.toLowerCase().includes(q) || t.ten.toLowerCase().includes(q));
+      rows.innerHTML = list.length ? list.map((t,i) => `
+        <tr>
+          <td><strong>${t.id}</strong></td>
+          <td>${t.ten}</td>
+          <td class="text-muted">${t.moTa || '-'}</td>
+          <td>${[342,288,350,268][i] || 0}</td>
+          <td class="actions">
+            <button class="btn btn-ghost btn-sm" onclick="openEdit('${t.id}')" title="Sửa">✏️</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="del('${t.id}')" title="Xoá">🗑</button>
+          </td>
+        </tr>`).join('')
+        : '<tr><td colspan="5"><div class="empty">Chưa có dữ liệu.</div></td></tr>';
+    }
+    function form(t){
+      return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Mã<span class="req">*</span></label>
+            <input class="form-control" value="${t?.id||''}" maxlength="4" ${t?'disabled':''} required></div>
+          <div class="form-group"><label class="form-label">Tên tổ dân phố<span class="req">*</span></label>
+            <input class="form-control" value="${t?.ten||''}" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Mô tả</label>
+          <textarea class="form-control">${t?.moTa||''}</textarea></div>`;
+    }
+    function openEdit(id){
+      const t = MOCK.toDanPho.find(x => x.id === id);
+      modal({ title:'Cập nhật - ' + t.id, body: form(t), okText:'Lưu',
+        onOk:() => toast('Đã cập nhật','success') });
+    }
+    function del(id){
+      if(!confirm('Xoá tổ dân phố ' + id + '?')) return;
+      const i = MOCK.toDanPho.findIndex(x => x.id === id);
+      MOCK.toDanPho.splice(i,1); render(); toast('Đã xoá','success');
+    }
+    window.openEdit = openEdit; window.del = del;
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      modal({ title:'Thêm tổ dân phố', body: form(), okText:'Tạo mới',
+        onOk:() => toast('Đã thêm tổ dân phố','success') });
+    });
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    render();
+  </script>
+</body>
+</html>

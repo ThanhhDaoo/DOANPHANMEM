@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bảng điều khiển - Cán bộ y tế</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'officer', active:'dashboard',
+      pageTitle:'Bảng điều khiển', pageSub:'Tổng quan tình hình y tế trong phường'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="stats-grid mb-6">
+        <div class="stat"><div class="icon">📋</div><div class="label">Khai báo hôm nay</div><div class="value">38</div><div class="delta">+12% so với hôm qua</div></div>
+        <div class="stat"><div class="icon">⚠️</div><div class="label">Trường hợp nguy cơ cao</div><div class="value">3</div><div class="delta down">+1 mới</div></div>
+        <div class="stat"><div class="icon">🆘</div><div class="label">Yêu cầu chờ xử lý</div><div class="value">5</div><div class="delta">2 đang xử lý</div></div>
+        <div class="stat"><div class="icon">👥</div><div class="label">Người dân đang theo dõi</div><div class="value">142</div><div class="delta">8 mới trong tuần</div></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Khai báo nguy cơ cao cần xem xét</h3>
+            <a href="declarations.html" class="btn btn-ghost btn-sm">Tất cả →</a>
+          </div>
+          <div class="table-wrap" style="border:none;border-radius:0">
+            <table class="table">
+              <thead><tr><th>Người dân</th><th>Tổ DP</th><th>Nhiệt độ</th><th>Triệu chứng</th><th>Nguy cơ</th><th></th></tr></thead>
+              <tbody id="hi"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Phân bố theo tổ dân phố</h3></div>
+          <div class="card-body">
+            ${MOCK.toDanPho.map((t, i) => {
+              const v = [38, 26, 31, 12][i];
+              return `
+                <div class="mb-3">
+                  <div class="flex justify-between text-sm mb-2"><span>${t.ten}</span><strong>${v}</strong></div>
+                  <div style="height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden">
+                    <div style="height:100%;width:${v*2}%;background:var(--primary);border-radius:99px"></div>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Yêu cầu hỗ trợ mới</h3>
+          <a class="btn btn-ghost btn-sm" href="requests.html">Tất cả →</a>
+        </div>
+        <div class="table-wrap" style="border:none;border-radius:0">
+          <table class="table">
+            <thead><tr><th>Người gửi</th><th>Loại</th><th>Tiêu đề</th><th>Thời gian</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody id="reqs"></tbody>
+          </table>
+        </div>
+      </div>
+    `);
+
+    document.getElementById('hi').innerHTML = MOCK.declarations
+      .filter(d => d.nguyCo !== 'Thấp').map(d => `
+        <tr>
+          <td><strong>${d.hoTen}</strong><div class="text-xs text-muted">${d.id}</div></td>
+          <td>${d.toDanPho}</td>
+          <td>${d.nhietDo}°C</td>
+          <td>${d.trieuChung}</td>
+          <td><span class="badge ${d.nguyCo==='Cao'?'badge-danger':'badge-warning'}">${d.nguyCo}</span></td>
+          <td><button class="btn btn-outline btn-sm">Xem</button></td>
+        </tr>`).join('');
+
+    document.getElementById('reqs').innerHTML = MOCK.requests.map(r => `
+      <tr>
+        <td><strong>${r.hoTen}</strong></td>
+        <td>${r.loai}</td>
+        <td>${r.tieuDe}</td>
+        <td>${fmtDateTime(r.thoiGian)}</td>
+        <td><span class="badge ${r.trangThai==='Đã phản hồi'?'badge-success':r.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${r.trangThai}</span></td>
+        <td class="actions"><a class="btn btn-primary btn-sm" href="requests.html">Phản hồi</a></td>
+      </tr>`).join('');
+  </script>
+</body>
+</html>
