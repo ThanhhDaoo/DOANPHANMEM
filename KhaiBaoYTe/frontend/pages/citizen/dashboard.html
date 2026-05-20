@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang chủ - Người dân</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { user, content } = Layout.mount({
+      role:'citizen', active:'dashboard',
+      pageTitle:'Trang chủ', pageSub:'Tổng quan hoạt động khai báo y tế của bạn'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="stats-grid mb-6">
+        <div class="stat"><div class="icon">📋</div><div class="label">Khai báo trong tháng</div><div class="value">5</div><div class="delta">+2 so với tháng trước</div></div>
+        <div class="stat"><div class="icon">🌡️</div><div class="label">Tình trạng hiện tại</div><div class="value" style="font-size:18px">Bình thường</div><div class="delta">Cập nhật 2 giờ trước</div></div>
+        <div class="stat"><div class="icon">🆘</div><div class="label">Yêu cầu hỗ trợ</div><div class="value">1</div><div class="delta">Đang chờ phản hồi</div></div>
+        <div class="stat"><div class="icon">🔔</div><div class="label">Thông báo chưa đọc</div><div class="value">2</div><div class="delta">Mới gửi hôm nay</div></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Khai báo gần đây</h3>
+            <a class="btn btn-ghost btn-sm" href="history.html">Xem tất cả →</a>
+          </div>
+          <div class="table-wrap" style="border:none;border-radius:0">
+            <table class="table">
+              <thead><tr><th>Mã</th><th>Thời gian</th><th>Nhiệt độ</th><th>Triệu chứng</th><th>Trạng thái</th></tr></thead>
+              <tbody id="recent"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Hành động nhanh</h3></div>
+          <div class="card-body flex flex-col gap-3">
+            <a class="btn btn-primary btn-block" href="declare.html">📝 Khai báo y tế mới</a>
+            <a class="btn btn-outline btn-block" href="health-update.html">🌡️ Cập nhật sức khoẻ</a>
+            <a class="btn btn-outline btn-block" href="requests.html">🆘 Gửi yêu cầu hỗ trợ</a>
+            <a class="btn btn-ghost btn-block" href="notifications.html">🔔 Xem thông báo</a>
+          </div>
+        </div>
+      </div>
+    `);
+
+    const recent = document.getElementById('recent');
+    const myDecl = MOCK.declarations.filter(d => d.maNguoiDan === user.id);
+    const list = (myDecl.length ? myDecl : MOCK.declarations).slice(0,4);
+    recent.innerHTML = list.map(d => `
+      <tr>
+        <td><strong>${d.id}</strong></td>
+        <td>${fmtDateTime(d.thoiGian)}</td>
+        <td>${d.nhietDo}°C</td>
+        <td>${d.trieuChung}</td>
+        <td><span class="badge ${d.trangThai==='Đã xử lý'?'badge-success':d.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${d.trangThai}</span></td>
+      </tr>`).join('');
+  </script>
+</body>
+</html>

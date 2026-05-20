@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thông báo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'citizen', active:'notify',
+      pageTitle:'Thông báo', pageSub:'Tin nhắn từ trạm y tế phường gửi đến bạn.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Hộp thư</h3>
+          <button class="btn btn-ghost btn-sm" id="markall">Đánh dấu đã đọc tất cả</button>
+        </div>
+        <ul id="list" style="padding:0;display:flex;flex-direction:column"></ul>
+      </div>
+    `);
+
+    const list = document.getElementById('list');
+    function render(){
+      list.innerHTML = MOCK.notifications.map(n => `
+        <li style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;${n.daDoc?'':'background:var(--primary-50)'}">
+          <div style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)">
+            ${n.loai==='Cảnh báo'?'⚠️':n.loai==='Nhắc nhở'?'🔔':'📣'}
+          </div>
+          <div class="flex-col" style="flex:1;display:flex;gap:4px">
+            <div class="flex justify-between">
+              <strong>${n.tieuDe}</strong>
+              <span class="text-xs text-muted">${fmtDateTime(n.thoiGian)}</span>
+            </div>
+            <div class="text-sm text-muted">${n.noiDung}</div>
+            <div><span class="badge badge-muted">${n.loai}</span></div>
+          </div>
+        </li>`).join('');
+    }
+    render();
+    document.getElementById('markall').addEventListener('click', () => {
+      MOCK.notifications.forEach(n => n.daDoc = true);
+      toast('Đã đánh dấu tất cả là đã đọc','success'); render();
+    });
+  </script>
+</body>
+</html>

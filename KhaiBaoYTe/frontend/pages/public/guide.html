@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hướng dẫn khai báo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <main class="public-content">
+    <div class="content-header">
+      <div>
+        <h1>Hướng dẫn khai báo y tế</h1>
+        <div class="sub">Các bước cơ bản để bà con khai báo y tế trực tuyến.</div>
+      </div>
+    </div>
+
+    <section class="card card-pad mb-6">
+      <h2 class="mb-3">1. Đăng ký tài khoản</h2>
+      <p class="text-muted">Truy cập trang đăng ký, điền thông tin: CCCD, họ tên, số điện thoại,
+        địa chỉ, mật khẩu. Sau khi đăng ký thành công, bà con có thể đăng nhập để khai báo.</p>
+    </section>
+
+    <section class="card card-pad mb-6">
+      <h2 class="mb-3">2. Khai báo y tế</h2>
+      <ol style="padding-left:18px;color:var(--text-muted);line-height:1.9">
+        <li>Đăng nhập hệ thống bằng số điện thoại và mật khẩu.</li>
+        <li>Vào mục <strong>Khai báo mới</strong>, điền nhiệt độ cơ thể, triệu chứng (nếu có).</li>
+        <li>Cập nhật lịch sử di chuyển và tiếp xúc trong 14 ngày gần nhất.</li>
+        <li>Nhấn <strong>Gửi khai báo</strong>. Hệ thống sẽ ghi nhận và gửi xác nhận.</li>
+      </ol>
+    </section>
+
+    <section class="card card-pad mb-6">
+      <h2 class="mb-3">3. Cập nhật tình trạng sức khoẻ</h2>
+      <p class="text-muted">Sau khi khai báo, bà con có thể cập nhật tình trạng sức khoẻ
+        hàng ngày trong mục <strong>Cập nhật sức khoẻ</strong>. Cán bộ y tế sẽ theo dõi và liên hệ
+        khi cần.</p>
+    </section>
+
+    <section class="card card-pad">
+      <h2 class="mb-3">4. Khi nào cần gửi yêu cầu hỗ trợ?</h2>
+      <ul style="padding-left:18px;color:var(--text-muted);line-height:1.9">
+        <li>Sốt từ 38°C trở lên kéo dài quá 2 ngày.</li>
+        <li>Có triệu chứng khó thở, đau ngực, mất vị giác.</li>
+        <li>Tiếp xúc gần với người mắc bệnh truyền nhiễm.</li>
+        <li>Cần tư vấn về thuốc, lịch tiêm, khám tại nhà.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/public-layout.js"></script>
+  <script>PublicLayout.mount('guide');</script>
+</body>
+</html>

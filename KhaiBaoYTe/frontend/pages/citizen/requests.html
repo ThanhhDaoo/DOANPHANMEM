@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yêu cầu hỗ trợ</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { content } = Layout.mount({
+      role:'citizen', active:'request',
+      pageTitle:'Yêu cầu hỗ trợ y tế',
+      pageSub:'Gửi yêu cầu để được cán bộ y tế phường tư vấn hoặc hỗ trợ.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="content-header" style="margin:0 0 14px">
+        <div></div>
+        <button class="btn btn-primary" id="btn-new">+ Tạo yêu cầu mới</button>
+      </div>
+
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px" id="list"></div>
+    `);
+
+    const list = document.getElementById('list');
+    function render(){
+      list.innerHTML = MOCK.requests.map(r => `
+        <div class="card card-pad">
+          <div class="flex justify-between mb-2">
+            <span class="badge badge-info">${r.loai}</span>
+            <span class="badge ${r.trangThai==='Đã phản hồi'?'badge-success':r.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${r.trangThai}</span>
+          </div>
+          <h3>${r.tieuDe}</h3>
+          <p class="text-muted text-sm mt-2">${r.noiDung}</p>
+          <div class="flex justify-between mt-3 text-xs text-muted">
+            <span>#${r.id}</span><span>${fmtDateTime(r.thoiGian)}</span>
+          </div>
+        </div>`).join('');
+    }
+    render();
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      modal({
+        title:'Tạo yêu cầu hỗ trợ',
+        body: `
+          <div class="form-group"><label class="form-label">Loại yêu cầu<span class="req">*</span></label>
+            <select class="form-control" id="m-loai">
+              <option>Tư vấn y tế</option><option>Yêu cầu khám tại nhà</option>
+              <option>Xin thuốc</option><option>Khác</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Tiêu đề<span class="req">*</span></label>
+            <input class="form-control" id="m-td" required></div>
+          <div class="form-group"><label class="form-label">Nội dung<span class="req">*</span></label>
+            <textarea class="form-control" id="m-nd" required></textarea></div>
+          <div class="form-group"><label class="form-label">Đính kèm (tuỳ chọn)</label>
+            <input class="form-control" type="file" multiple></div>
+        `,
+        okText:'Gửi yêu cầu',
+        onOk: () => { toast('Đã gửi yêu cầu hỗ trợ','success'); }
+      });
+    });
+  </script>
+</body>
+</html>

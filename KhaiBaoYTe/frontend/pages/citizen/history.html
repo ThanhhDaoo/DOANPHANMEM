@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lịch sử khai báo</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { user, content } = Layout.mount({
+      role:'citizen', active:'history',
+      pageTitle:'Lịch sử khai báo y tế', pageSub:'Toàn bộ phiếu khai báo bạn đã gửi.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="toolbar">
+        <div class="search"><input class="form-control" id="q" placeholder="🔍 Tìm theo mã, triệu chứng..."></div>
+        <select class="form-control" id="filter-status" style="max-width:200px">
+          <option value="">Tất cả trạng thái</option>
+          <option>Chờ xử lý</option><option>Đang xử lý</option><option>Đã xử lý</option>
+        </select>
+        <a class="btn btn-primary" href="declare.html">+ Khai báo mới</a>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Mã</th><th>Thời gian</th><th>Nhiệt độ</th><th>Triệu chứng</th><th>Mức nguy cơ</th><th>Trạng thái</th><th></th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    `);
+
+    const allMine = MOCK.declarations.filter(d => d.maNguoiDan === user.id);
+    const data = allMine.length ? allMine : MOCK.declarations;
+    const tbody = document.getElementById('rows');
+
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const s = document.getElementById('filter-status').value;
+      const list = data.filter(d =>
+        (!q || d.id.toLowerCase().includes(q) || d.trieuChung.toLowerCase().includes(q)) &&
+        (!s || d.trangThai === s));
+      tbody.innerHTML = list.length ? list.map(d => `
+        <tr>
+          <td><strong>${d.id}</strong></td>
+          <td>${fmtDateTime(d.thoiGian)}</td>
+          <td>${d.nhietDo}°C</td>
+          <td>${d.trieuChung}</td>
+          <td><span class="badge ${d.nguyCo==='Cao'?'badge-danger':d.nguyCo==='Trung bình'?'badge-warning':'badge-success'}">${d.nguyCo}</span></td>
+          <td><span class="badge ${d.trangThai==='Đã xử lý'?'badge-success':d.trangThai==='Đang xử lý'?'badge-warning':'badge-muted'}">${d.trangThai}</span></td>
+          <td class="actions"><button class="btn btn-ghost btn-sm" onclick="alert('Mở chi tiết ${d.id}')">Chi tiết</button></td>
+        </tr>`).join('')
+        : '<tr><td colspan="7"><div class="empty">Chưa có khai báo nào.</div></td></tr>';
+    }
+    document.getElementById('q').addEventListener('input', debounce(render, 200));
+    document.getElementById('filter-status').addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>

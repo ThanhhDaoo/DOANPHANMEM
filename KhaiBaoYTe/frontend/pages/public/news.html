@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tin tức y tế</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <main class="public-content">
+    <div class="content-header">
+      <div>
+        <h1>Tin tức y tế</h1>
+        <div class="sub">Cập nhật mới nhất từ trạm y tế phường Thanh Khê</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <input class="form-control" id="search" placeholder="🔍 Tìm tiêu đề, nội dung...">
+      </div>
+      <select class="form-control" id="filter-type" style="max-width:240px">
+        <option value="">Tất cả phân loại</option>
+        <option>Hướng dẫn</option>
+        <option>Tin tức dịch bệnh</option>
+        <option>Thông báo khẩn</option>
+      </select>
+    </div>
+
+    <div class="news-grid" id="news-grid"></div>
+  </main>
+
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/mock-data.js"></script>
+  <script src="/frontend/assets/js/public-layout.js"></script>
+  <script>
+    PublicLayout.mount('news');
+    const grid = document.getElementById('news-grid');
+    function render(){
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const t = document.getElementById('filter-type').value;
+      const list = MOCK.news.filter(n =>
+        (!q || n.title.toLowerCase().includes(q) || n.summary.toLowerCase().includes(q)) &&
+        (!t || n.type === t));
+      grid.innerHTML = list.length ? list.map(n => `
+        <article class="news-card">
+          <div class="thumb">${n.icon}</div>
+          <div class="body">
+            <span class="badge badge-primary">${n.type}</span>
+            <h3>${n.title}</h3>
+            <p class="text-muted text-sm">${n.summary}</p>
+            <div class="meta"><span>${n.author}</span><span>${fmtDate(n.date)}</span></div>
+          </div>
+        </article>`).join('')
+        : '<div class="empty">Không tìm thấy bài viết phù hợp.</div>';
+    }
+    document.getElementById('search').addEventListener('input', debounce(render, 200));
+    document.getElementById('filter-type').addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>

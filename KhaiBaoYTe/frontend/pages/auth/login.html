@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-side">
+      <div style="font-size:42px;margin-bottom:12px">⚕️</div>
+      <h2>Khai báo Y tế trực tuyến</h2>
+      <p>Hệ thống chính thức của UBND phường Thanh Khê - giúp bà con khai báo y tế
+         và theo dõi sức khoẻ một cách thuận tiện, an toàn.</p>
+      <div class="mt-6 text-sm" style="color:rgba(255,255,255,.75)">
+        Tài khoản demo:<br>
+        <code style="color:#fff">an / 123</code> (Người dân)<br>
+        <code style="color:#fff">ha / 123</code> (Cán bộ y tế)<br>
+        <code style="color:#fff">admin / 123</code> (Admin)
+      </div>
+    </div>
+    <div class="auth-form">
+      <div class="box">
+        <h1>Đăng nhập</h1>
+        <p class="sub">Nhập tài khoản để truy cập hệ thống.</p>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">Tên đăng nhập / SĐT<span class="req">*</span></label>
+            <input class="form-control" name="username" required autofocus>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mật khẩu<span class="req">*</span></label>
+            <input class="form-control" name="password" type="password" required>
+          </div>
+
+          <div class="flex items-center justify-between mb-4">
+            <label class="flex items-center gap-2 text-sm text-muted">
+              <input type="checkbox"> Ghi nhớ tôi
+            </label>
+            <a href="#" class="text-sm" style="color:var(--primary)">Quên mật khẩu?</a>
+          </div>
+
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Đăng nhập</button>
+
+          <p class="text-center text-sm text-muted mt-4">
+            Chưa có tài khoản?
+            <a href="/frontend/pages/auth/register.html" style="color:var(--primary);font-weight:500">Đăng ký ngay</a>
+          </p>
+          <p class="text-center text-sm mt-3">
+            <a href="/frontend/index.html" class="text-muted">← Về trang chủ</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const u = Auth.login(fd.get('username').trim(), fd.get('password'));
+      if(!u){ toast('Sai tên đăng nhập hoặc mật khẩu', 'error'); return; }
+      toast('Xin chào, ' + u.name, 'success');
+      setTimeout(() => window.location.href = Auth.homeFor(u.role), 600);
+    });
+  </script>
+</body>
+</html>

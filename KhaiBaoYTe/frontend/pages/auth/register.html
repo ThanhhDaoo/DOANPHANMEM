@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng ký tài khoản</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-side">
+      <div style="font-size:42px;margin-bottom:12px">📝</div>
+      <h2>Đăng ký tài khoản</h2>
+      <p>Tạo tài khoản chỉ với vài bước, để khai báo y tế trực tuyến và nhận hỗ
+         trợ từ trạm y tế phường.</p>
+      <ul class="mt-6 text-sm" style="color:rgba(255,255,255,.85);line-height:1.9">
+        <li>✓ Bảo mật thông tin theo quy định</li>
+        <li>✓ Khai báo mọi lúc mọi nơi</li>
+        <li>✓ Nhận thông báo khi có yêu cầu cập nhật</li>
+      </ul>
+    </div>
+    <div class="auth-form">
+      <div class="box" style="max-width:520px">
+        <h1>Tạo tài khoản</h1>
+        <p class="sub">Vui lòng cung cấp đầy đủ thông tin sau.</p>
+
+        <form id="register-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Họ và tên<span class="req">*</span></label>
+              <input class="form-control" name="hoTen" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">CCCD<span class="req">*</span></label>
+              <input class="form-control" name="cccd" pattern="\d{12}" maxlength="12" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ngày sinh<span class="req">*</span></label>
+              <input class="form-control" name="ngaySinh" type="date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giới tính<span class="req">*</span></label>
+              <select class="form-control" name="gioiTinh" required>
+                <option value="">-- Chọn --</option>
+                <option value="1">Nam</option>
+                <option value="0">Nữ</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Số điện thoại<span class="req">*</span></label>
+              <input class="form-control" name="sdt" pattern="\d{10}" maxlength="10" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-control" name="email" type="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tổ dân phố<span class="req">*</span></label>
+            <select class="form-control" name="toDanPho" required>
+              <option value="">-- Chọn tổ dân phố --</option>
+              <option>Tổ dân phố 1</option>
+              <option>Tổ dân phố 2</option>
+              <option>Tổ dân phố 3</option>
+              <option>Tổ dân phố 4</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Địa chỉ nhà<span class="req">*</span></label>
+            <input class="form-control" name="diaChi" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mật khẩu<span class="req">*</span></label>
+              <input class="form-control" name="matKhau" type="password" minlength="6" required>
+              <span class="form-hint">Tối thiểu 6 ký tự.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Xác nhận mật khẩu<span class="req">*</span></label>
+              <input class="form-control" name="matKhauXn" type="password" minlength="6" required>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 text-sm text-muted mb-4">
+            <input type="checkbox" required> Tôi đồng ý với điều khoản và quy định bảo mật.
+          </label>
+
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Đăng ký</button>
+
+          <p class="text-center text-sm text-muted mt-4">
+            Đã có tài khoản?
+            <a href="/frontend/pages/auth/login.html" style="color:var(--primary);font-weight:500">Đăng nhập</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      if(fd.get('matKhau') !== fd.get('matKhauXn')){
+        toast('Mật khẩu xác nhận không khớp', 'error'); return;
+      }
+      toast('Đăng ký thành công, mời bạn đăng nhập.', 'success');
+      setTimeout(() => window.location.href = '/frontend/pages/auth/login.html', 800);
+    });
+  </script>
+</body>
+</html>

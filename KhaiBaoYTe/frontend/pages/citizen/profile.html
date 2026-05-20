@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hồ sơ cá nhân</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/layout.js"></script>
+  <script>
+    const { user, content } = Layout.mount({
+      role:'citizen', active:'profile',
+      pageTitle:'Hồ sơ cá nhân', pageSub:'Cập nhật thông tin để cán bộ y tế liên hệ khi cần.'
+    });
+
+    content.insertAdjacentHTML('beforeend', `
+      <div class="grid" style="grid-template-columns:1fr 2fr;gap:18px">
+        <div class="card card-pad" style="text-align:center">
+          <div style="width:96px;height:96px;border-radius:50%;background:var(--primary-50);color:var(--primary);
+                      display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;margin:0 auto">
+            ${(user.name||'?').charAt(0).toUpperCase()}
+          </div>
+          <h3 class="mt-3">${user.name}</h3>
+          <p class="text-muted text-sm">Mã: ${user.id}</p>
+          <button class="btn btn-outline btn-sm mt-4">Đổi ảnh đại diện</button>
+          <a class="btn btn-ghost btn-sm mt-2 btn-block" href="/frontend/pages/auth/change-password.html">🔒 Đổi mật khẩu</a>
+        </div>
+
+        <form class="card">
+          <div class="card-header"><h3 class="card-title">Thông tin cá nhân</h3></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Họ và tên</label>
+                <input class="form-control" value="${user.name}"></div>
+              <div class="form-group"><label class="form-label">CCCD</label>
+                <input class="form-control" value="048203001001" disabled></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Ngày sinh</label>
+                <input class="form-control" type="date" value="1990-05-12"></div>
+              <div class="form-group"><label class="form-label">Giới tính</label>
+                <select class="form-control"><option>Nam</option><option>Nữ</option></select></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Số điện thoại</label>
+                <input class="form-control" value="0905111001"></div>
+              <div class="form-group"><label class="form-label">Email</label>
+                <input class="form-control" type="email" value="an.nv@example.com"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Địa chỉ</label>
+              <input class="form-control" value="12 Hà Huy Tập, Thanh Khê, Đà Nẵng"></div>
+            <div class="form-group"><label class="form-label">Tổ dân phố</label>
+              <select class="form-control"><option>Tổ dân phố 1</option><option>Tổ dân phố 2</option></select></div>
+            <div class="flex justify-end gap-2 mt-3">
+              <button type="reset" class="btn btn-ghost">Huỷ</button>
+              <button class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    `);
+
+    document.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault(); toast('Đã lưu thay đổi','success');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liên hệ</title>
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+  <link rel="stylesheet" href="/frontend/assets/css/components.css">
+  <link rel="stylesheet" href="/frontend/assets/css/layout.css">
+</head>
+<body>
+  <main class="public-content">
+    <div class="content-header">
+      <div><h1>Liên hệ hỗ trợ</h1><div class="sub">Thông tin liên hệ trạm y tế phường Thanh Khê</div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px">
+      <div class="card card-pad">
+        <h3>📍 Địa chỉ</h3>
+        <p class="text-muted mt-2">Trạm Y tế Phường Thanh Khê<br>Quận Thanh Khê, TP. Đà Nẵng</p>
+        <h3 class="mt-4">📞 Hotline</h3>
+        <p class="text-muted mt-2">0236 - 3 759 xxx<br>Khẩn cấp: 115</p>
+        <h3 class="mt-4">📧 Email</h3>
+        <p class="text-muted mt-2">tytphuongthankhe@danang.gov.vn</p>
+      </div>
+      <div class="card card-pad">
+        <h3>Gửi câu hỏi</h3>
+        <form class="mt-4" onsubmit="event.preventDefault(); toast('Cảm ơn, chúng tôi sẽ phản hồi sớm.','success'); this.reset();">
+          <div class="form-group"><label class="form-label">Họ tên</label><input class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Email / Số điện thoại</label><input class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Nội dung</label><textarea class="form-control" required></textarea></div>
+          <button class="btn btn-primary btn-block">Gửi</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/assets/js/auth.js"></script>
+  <script src="/frontend/assets/js/utils.js"></script>
+  <script src="/frontend/assets/js/public-layout.js"></script>
+  <script>PublicLayout.mount('contact');</script>
+</body>
+</html>
