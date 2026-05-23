@@ -35,30 +35,30 @@ INSERT INTO NGUOIDAN
 VALUES
 ('ND0001', 'TDP1', '048203001001', N'Nguyễn Văn An',  '1990-05-12', 1,
  '0905111001', 'an.nv@example.com',  N'12 Hà Huy Tập, Thanh Khê, Đà Nẵng',
- '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+ '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ01234',
  GETDATE(), N'Hoạt động', NULL, 0),
 
 ('ND0002', 'TDP1', '048203001002', N'Trần Thị Bình',  '1995-08-20', 0,
  '0905111002', 'binh.tt@example.com', N'25 Hà Huy Tập, Thanh Khê, Đà Nẵng',
- '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+ '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ01234',
  GETDATE(), N'Hoạt động', NULL, 0),
 
 ('ND0003', 'TDP2', '048203001003', N'Lê Hoàng Cường', '1988-02-03', 1,
  '0905111003', 'cuong.lh@example.com', N'48 Lê Độ, Thanh Khê, Đà Nẵng',
- '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+ '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ01234',
  GETDATE(), N'Hoạt động', NULL, 0),
 
 -- Cán bộ y tế (cũng là người dân, vaiTro = 1)
 ('CB0001', 'TDP3', '048203009001', N'Bác sĩ Phạm Thu Hà', '1985-11-10', 0,
  '0905222001', 'ha.pt@yte.danang.gov.vn',
  N'Trạm y tế phường Thanh Khê',
- '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+ '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ01234',
  GETDATE(), N'Hoạt động', NULL, 1),
 
 ('CB0002', 'TDP3', '048203009002', N'Y tá Đỗ Minh Khôi',  '1992-04-22', 1,
  '0905222002', 'khoi.dm@yte.danang.gov.vn',
  N'Trạm y tế phường Thanh Khê',
- '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ012345',
+ '$2a$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRSTUVWXYZ01234',
  GETDATE(), N'Hoạt động', NULL, 1);
 GO
 
